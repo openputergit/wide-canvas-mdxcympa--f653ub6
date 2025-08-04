@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Shopping Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chat-container {
+            height: calc(100vh - 160px);
+        }
+        .message-container {
+            max-height: calc(100vh - 240px);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4 max-w-4xl">
+        <div class="bg-white rounded-lg shadow-lg">
+            <!-- Header -->
+            <div class="p-4 border-b border-gray-200">
+                <h1 class="text-2xl font-bold text-gray-800">AI Shopping Assistant</h1>
+                <p class="text-sm text-gray-600">Powered by Gemini 2.0</p>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <!-- Messages -->
+                <div id="messageContainer" class="message-container overflow-y-auto p-4 space-y-4">
+                    <!-- Initial bot message -->
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                            <i class="bi bi-robot text-white"></i>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
+                            <p class="text-gray-800">Hello! I'm your AI shopping assistant. I can help you find products, provide details, and even process your orders. What are you looking for today?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-4 border-t border-gray-200">
+                    <div class="flex space-x-2">
+                        <input type="text" id="userInput" class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message here...">
+                        <button onclick="sendMessage()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messageContainer = document.getElementById('messageContainer');
+        const userInput = document.getElementById('userInput');
+
+        // Simulated product database
+        const products = {
+            'laptop': { name: 'Premium Laptop', price: '$999', details: 'High-performance laptop with 16GB RAM' },
+            'phone': { name: 'Smartphone Pro', price: '$699', details: '6.7-inch display, 5G capable' },
+            'headphones': { name: 'Wireless Headphones', price: '$199', details: 'Active noise cancellation' }
+        };
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start space-x-3';
+
+            const iconDiv = document.createElement('div');
+            iconDiv.className = `w-8 h-8 rounded-full ${isUser ? 'bg-green-500' : 'bg-blue-500'} flex items-center justify-center`;
+            iconDiv.innerHTML = `<i class="bi bi-${isUser ? 'person' : 'robot'} text-white"></i>`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = `${isUser ? 'bg-green-100' : 'bg-gray-100'} rounded-lg p-3 max-w-[80%]`;
+            contentDiv.innerHTML = `<p class="text-gray-800">${content}</p>`;
+
+            messageDiv.appendChild(iconDiv);
+            messageDiv.appendChild(contentDiv);
+            messageContainer.appendChild(messageDiv);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        function processQuery(query) {
+            query = query.toLowerCase();
+            
+            // Check for product search
+            for (const [key, product] of Object.entries(products)) {
+                if (query.includes(key)) {
+                    if (query.includes('order') || query.includes('buy')) {
+                        return `Great choice! To order the ${product.name} (${product.price}), please click the link below:\n<button onclick="placeOrder('${key}')" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Place Order</button>`;
+                    }
+                    if (query.includes('detail') || query.includes('info')) {
+                        return `Here are the details for ${product.name}:\nPrice: ${product.price}\n${product.details}`;
+                    }
+                    return `I found ${product.name} for ${product.price}. Would you like more details or would you like to place an order?`;
+                }
+            }
+
+            return "I'm sorry, I couldn't find any products matching your query. Could you please try another search?";
+        }
+
+        function placeOrder(productKey) {
+            const product = products[productKey];
+            addMessage(`Order placed successfully for ${product.name}! Your total is ${product.price}. Thank you for shopping with us!`);
+        }
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                const response = processQuery(message);
+                setTimeout(() => addMessage(response), 500);
+                userInput.value = '';
+            }
+        }
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
